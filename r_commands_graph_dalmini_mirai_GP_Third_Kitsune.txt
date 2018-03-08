@@ -1,0 +1,12 @@
+jpeg('Kitsune_dalmini_syn_mirai_GP_Third.jpg')
+plot(datasingledasyn$X0.232237554766,xlab="",xaxt="n", main="Single DA",col=ifelse(datasingledasyn$X0>0,"red","black"),ylab="Anomaly Score",xlim=c(0, 1700000))
+#legend( "topleft"
+#       , inset = 0.01, 
+#      , cex = 0.8
+#     , legend = c("Benign", "Malicious"), 
+#    , title="Packet Label"
+#   , col = c("black","red"), 
+#  , pt.bg = c("black","red")
+# , pch = c(21,22), horiz=TRUE
+#)"
+dev.off()
