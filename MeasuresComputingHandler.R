@@ -63,6 +63,15 @@ calcTPRForFPRZero<-function (scores, labels)
   return (TPR)
 }
 
+calcTPRForFPR0.001<-function (scores, labels)
+{
+  maxBenignScore=tail(sort(scores),round(length(scores)*0.001))[1]
+  TP=length(scores[which(labels==1 & scores>maxBenignScore)])
+  FN=length(scores[which(labels==1 & scores<maxBenignScore)])
+  TPR= TP/(TP+FN)
+  return (TPR)
+}
+
 calcTPRForFPR0.01<-function (scores, labels)
 {
   maxBenignScore=tail(sort(scores),round(length(scores)*0.01))[1]
@@ -104,6 +113,15 @@ calcTPRForFPR0.1<-function (scores, labels)
 calcFNRForFPRZero<-function (scores, labels)
 {
   maxBenignScore=max(scores[which(labels==0)])
+  TP=length(scores[which(labels==1 & scores>maxBenignScore)])
+  FN=length(scores[which(labels==1 & scores<maxBenignScore)])
+  FNR= FN/(TP+FN)
+  return (FNR)
+}
+
+calcFNRForFPR0.001<-function (scores, labels)
+{
+  maxBenignScore=tail(sort(scores),round(length(scores)*0.001))[1]
   TP=length(scores[which(labels==1 & scores>maxBenignScore)])
   FN=length(scores[which(labels==1 & scores<maxBenignScore)])
   FNR= FN/(TP+FN)
@@ -165,7 +183,7 @@ calculateMeasuresOfScoresFolder <- function(folderPath)
   labelsRTSP <- read.csv('D:/datasets/KitsuneDatasets/labels/RTSP_labels.csv',sep=",",header=TRUE, skip = 1000000)
   
   scoreFilesList=list.files(folderPath)
-  print('name,auc,eer,TPR0.01,TPR0.05,TPR0.1,TPRForZeroFP,FNR0.01,FNR0.05,FNR0.1,FNRForZeroFP')
+  print('name,auc,eer,TPR0.001,TPR0.01,TPR0.05,TPR0.1,TPRForZeroFP,FNR0.001,FNR0.01,FNR0.05,FNR0.1,FNRForZeroFP')
   for (f in scoreFilesList)
   {
     
@@ -176,9 +194,16 @@ calculateMeasuresOfScoresFolder <- function(folderPath)
     
     data <- read.csv(paste(folderPath,f, sep=""),sep=",",header=FALSE, skip = 1000000)
     scores=data
+    if (grepl('SYN_lab',f)==TRUE)
+    {
+      
+      
+      labels=labelsSYN
+      name='SYN_lab'
+    }
     
     
-    if (grepl('etterArp',f)==TRUE)
+    else if (grepl('etterArp',f)==TRUE)
     {
       
       
@@ -262,29 +287,24 @@ calculateMeasuresOfScoresFolder <- function(folderPath)
       name='ssl_renego'
     }
     
-    else if (grepl('SYN_lab',f)==TRUE)
-    {
-      
-      
-      labels=labelsSYN
-      name='SYN_lab'
-    }
-    
+   
     else
       next
     
     auc=fastAUC(scores$V1,labels$X0)
     eer=calculateEqualError(labels$X0,scores$V1)
+    TPR0.001=calcTPRForFPR0.001(scores$V1,labels$X0)
     TPR0.01=calcTPRForFPR0.01(scores$V1,labels$X0)
     TPR0.05=calcTPRForFPR0.05(scores$V1,labels$X0)
     TPR0.1=calcTPRForFPR0.1(scores$V1,labels$X0)
     TPRForZeroFP=calcTPRForFPRZero(scores$V1,labels$X0)
 
+    FNR0.001=calcFNRForFPR0.001(scores$V1,labels$X0)
     FNR0.01=calcFNRForFPR0.01(scores$V1,labels$X0)
     FNR0.05=calcFNRForFPR0.05(scores$V1,labels$X0)
     FNR0.1=calcFNRForFPR0.1(scores$V1,labels$X0)
     FNRForZeroFP=calcFNRForFPRZero(scores$V1,labels$X0)
-    print(paste(name,paste(auc,paste(eer,paste(TPR0.01,paste(TPR0.05,paste(TPR0.1,paste(TPRForZeroFP,paste(FNR0.01,paste(FNR0.05,paste(FNR0.1,FNRForZeroFP, sep=","), sep=","), sep=","), sep=","), sep=","), sep=","), sep=","), sep=","), sep=","), sep=","))
+    print(paste(name,paste(auc,paste(eer,paste(TPR0.001,paste(TPR0.01,paste(TPR0.05,paste(TPR0.1,paste(TPRForZeroFP,paste(FNR0.001,paste(FNR0.01,paste(FNR0.05,paste(FNR0.1,FNRForZeroFP, sep=","), sep=","), sep=","), sep=","), sep=","), sep=","), sep=","), sep=","), sep=","), sep=","),sep=","),sep=","))
   }
   
 }
