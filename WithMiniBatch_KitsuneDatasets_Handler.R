@@ -1,6 +1,10 @@
-
 require(ROCR)
 require(zoo)
+require(prediction)
+install.packages('prediction')
+library(prediction)
+library(ROCR)
+library(zoo)
 
 perf_bf_pcStream<- function (folderPath,totalResPath)
 {
