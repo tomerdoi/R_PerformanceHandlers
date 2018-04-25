@@ -181,6 +181,7 @@ calculateMeasuresOfScoresFolder <- function(folderPath)
   labelsSSL2 <-  read.csv('D:/datasets/KitsuneDatasets/labels/ip_SSL2_isBad.csv',sep=",",header=TRUE, skip = 1000000)
   labelsSYN <-  read.csv('D:/datasets/KitsuneDatasets/labels/ip_SYN_isBad.csv',sep=",",header=TRUE, skip = 1000000)
   labelsRTSP <- read.csv('D:/datasets/KitsuneDatasets/labels/RTSP_labels.csv',sep=",",header=TRUE, skip = 1000000)
+  labelsMirai <- read.csv('D:/datasets/KitsuneDatasets/labels/ip_mirai_isBad.csv',sep=",",header=TRUE, skip = 121620)
   
   scoreFilesList=list.files(folderPath)
   print('name,auc,eer,TPR0.001,TPR0.01,TPR0.05,TPR0.1,TPRForZeroFP,FNR0.001,FNR0.01,FNR0.05,FNR0.1,FNRForZeroFP')
@@ -189,19 +190,33 @@ calculateMeasuresOfScoresFolder <- function(folderPath)
     
     fileLength=length(count.fields(paste(folderPath,f, sep="")))
     fileLength=fileLength*1
-    if (fileLength<1000000)
+    if (fileLength<10000)
       next
     
-    data <- read.csv(paste(folderPath,f, sep=""),sep=",",header=FALSE, skip = 1000000)
+    if (grepl('mirai',f)==TRUE)
+      instSkip=121620
+    else
+      instSkip=1000000
+    
+    data <- read.csv(paste(folderPath,f, sep=""),sep=",",header=FALSE, skip = instSkip)
     scores=data
     if (grepl('SYN_lab',f)==TRUE)
     {
+      
+      
       
       
       labels=labelsSYN
       name='SYN_lab'
     }
     
+    else if (grepl('mirai',f)==TRUE)
+    {
+      
+      
+      labels=labelsMirai
+      name='Mirai'
+    }
     
     else if (grepl('etterArp',f)==TRUE)
     {
@@ -287,7 +302,7 @@ calculateMeasuresOfScoresFolder <- function(folderPath)
       name='ssl_renego'
     }
     
-   
+    
     else
       next
     
@@ -298,14 +313,13 @@ calculateMeasuresOfScoresFolder <- function(folderPath)
     TPR0.05=calcTPRForFPR0.05(scores$V1,labels$X0)
     TPR0.1=calcTPRForFPR0.1(scores$V1,labels$X0)
     TPRForZeroFP=calcTPRForFPRZero(scores$V1,labels$X0)
-
+    
     FNR0.001=calcFNRForFPR0.001(scores$V1,labels$X0)
     FNR0.01=calcFNRForFPR0.01(scores$V1,labels$X0)
     FNR0.05=calcFNRForFPR0.05(scores$V1,labels$X0)
     FNR0.1=calcFNRForFPR0.1(scores$V1,labels$X0)
     FNRForZeroFP=calcFNRForFPRZero(scores$V1,labels$X0)
-    print(paste(name,paste(auc,paste(eer,paste(TPR0.001,paste(TPR0.01,paste(TPR0.05,paste(TPR0.1,paste(TPRForZeroFP,paste(FNR0.001,paste(FNR0.01,paste(FNR0.05,paste(FNR0.1,FNRForZeroFP, sep=","), sep=","), sep=","), sep=","), sep=","), sep=","), sep=","), sep=","), sep=","), sep=","),sep=","),sep=","))
+    print(paste(f,paste(auc,paste(eer,paste(TPR0.001,paste(TPR0.01,paste(TPR0.05,paste(TPR0.1,paste(TPRForZeroFP,paste(FNR0.001,paste(FNR0.01,paste(FNR0.05,paste(FNR0.1,FNRForZeroFP, sep=","), sep=","), sep=","), sep=","), sep=","), sep=","), sep=","), sep=","), sep=","), sep=","),sep=","),sep=","))
   }
   
 }
-
